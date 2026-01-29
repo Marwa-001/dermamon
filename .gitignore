@@ -1,0 +1,23 @@
+# ENV files
+.env
+*.env
+
+# Python
+venv/
+env/
+.venv/
+__pycache__/
+*.pyc
+
+# Node / Frontend
+node_modules/
+
+# VS Code
+.vscode/
+
+# Large files (IMPORTANT for you)
+*.zip
+*.mp4
+*.pdf
+skincare_datasets/
+models/

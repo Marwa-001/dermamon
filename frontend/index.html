@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dermamon - Your Skin Companion 🧴</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- API Status -->
+    <!-- <div class="api-status">
+        <span class="status-dot status-offline" id="statusDot"></span>
+        <span id="statusText">Connecting...</span>
+    </div> -->
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo" onclick="showSection('home')">🧴 Dermamon</div>
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a onclick="showSection('home')">Home</a></li>
+            </ul>
+            <div id="authButtons">
+                <button class="btn btn-secondary" onclick="showModal('login')" id="loginBtn">Login</button>
+                <button class="btn btn-primary" onclick="showModal('signup')" id="signupBtn">Sign Up</button>
+            </div>
+            <div id="userSection" style="display: none;">
+                <span id="userName" style="margin-right: 1rem; font-weight: 600;"></span>
+                <button class="btn btn-secondary" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Menu</h3>
+            <button class="close-sidebar" onclick="toggleSidebar()">×</button>
+        </div>
+        <ul class="sidebar-links">
+            <li><a onclick="showSection('home'); toggleSidebar();">Home</a></li>
+            <li id="sidebarAuth">
+                <a onclick="showModal('login'); toggleSidebar();">Login</a>
+                <a onclick="showModal('signup'); toggleSidebar();">Sign Up</a>
+            </li>
+            <li id="sidebarLogout" style="display: none;">
+                <a onclick="logout(); toggleSidebar();">Logout</a>
+            </li>
+        </ul>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Welcome Banner -->
+    <div class="welcome-banner" id="welcomeBanner">
+        <button class="close-banner" onclick="closeBanner()">×</button>
+        <h1>Welcome to Dermamon</h1>
+        <p>Your intelligent skin companion - analyzing products with AI-powered insights!</p>
+        <p style="margin-top: 0.5rem;">Chat with Dermamon, check product safety, and play fun games!</p>
+    </div>
+
+    <div class="main-content">
+        <!-- Home Section -->
+        <section id="homeSection">
+            <div class="features">
+                <div class="feature-card" onclick="showProductAnalysis()">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Product Analysis</h3>
+                    <p>Enter product name or ingredients to get AI-powered risk assessment.</p>
+                </div>
+                <div class="feature-card" onclick="showRecommendations()">
+                    <div class="feature-icon">✨</div>
+                    <h3>Recommendations</h3>
+                    <p>Get personalized product recommendations for your skin type.</p>
+                </div>
+                <div class="feature-card" onclick="showAllergyCheck()">
+                    <div class="feature-icon">🩺</div>
+                    <h3>Allergy Detection</h3>
+                    <p>Describe symptoms and get AI-powered analysis with remedies.</p>
+                </div>
+            </div>
+
+            <!-- Product Analysis Form -->
+            <section class="form-section" id="productAnalysisForm">
+                <button class="close-form" onclick="closeForm('productAnalysisForm')">×</button>
+                <h2>🔍 Product Analysis</h2>
+                <form onsubmit="analyzeProduct(event)">
+                    <div class="form-group">
+                        <label>Product Name or Ingredients</label>
+                        <textarea id="productInput" placeholder="Try: 'CeraVe Moisturizing Cream' or 'Water, Glycerin, Niacinamide, Fragrance'" required rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Skin Type</label>
+                        <select id="skinType" required>
+                            <option value="">Select</option>
+                            <option value="normal">Normal</option>
+                            <option value="dry">Dry</option>
+                            <option value="oily">Oily</option>
+                            <option value="sensitive">Sensitive</option>
+                            <option value="acne">Acne-Prone</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Known Allergies (Optional)</label>
+                        <textarea id="allergies" placeholder="e.g., Fragrance, Parabens" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Analyze Product</button>
+                </form>
+            </section>
+
+            <!-- Recommendation Form -->
+            <section class="form-section" id="recommendationForm">
+                <button class="close-form" onclick="closeForm('recommendationForm')">×</button>
+                <h2>✨ Get Recommendations</h2>
+                <form onsubmit="getRecommendations(event)">
+                    <div class="form-group">
+                        <label>Product Type</label>
+                        <select id="productType" required>
+                            <option value="">Select</option>
+                            <option value="cleanser">Cleanser</option>
+                            <option value="moisturizer">Moisturizer</option>
+                            <option value="serum">Serum</option>
+                            <option value="sunscreen">Sunscreen</option>
+                            <option value="toner">Toner</option>
+                            <option value="face_wash">Face Wash</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Skin Type</label>
+                        <select id="recSkinType" required>
+                            <option value="">Select</option>
+                            <option value="dry">Dry</option>
+                            <option value="oily">Oily</option>
+                            <option value="sensitive">Sensitive</option>
+                            <option value="acne">Acne-Prone</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Primary Concern</label>
+                        <select id="skinConcern" required>
+                            <option value="">Select</option>
+                            <option value="acne">Acne</option>
+                            <option value="aging">Anti-Aging</option>
+                            <option value="dryness">Dryness</option>
+                            <option value="sensitivity">Sensitivity</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Get Recommendations</button>
+                </form>
+            </section>
+
+            <!-- Allergy Check Form -->
+<section class="form-section" id="allergyCheckForm">
+    <button class="close-form" onclick="closeForm('allergyCheckForm')">×</button>
+    <h2>🩺 Allergy Detection</h2>
+    <form onsubmit="analyzeAllergy(event)">
+        <div class="form-group">
+            <label>Upload Photo of Affected Area (Optional)</label>
+            <input type="file" id="allergyImage" accept="image/*" onchange="previewAllergyImage(event)">
+            <div id="imagePreview" style="margin-top: 1rem;"></div>
+        </div>
+        <div class="form-group">
+            <label>Describe Symptoms <span id="symptomsRequired">(Required)</span></label>
+            <textarea id="allergySymptoms" placeholder="e.g., Red rash, itching, burning..." rows="4"></textarea>
+            <small style="color: var(--text-light); font-size: 0.85rem;">
+                <span id="symptomsHint">Describe your symptoms in detail</span>
+            </small>
+        </div>
+        <div class="form-group">
+            <label>Suspected Product/Ingredients (Optional)</label>
+            <textarea id="suspectedIngredients" placeholder="Product or ingredients..." rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Analyze Allergy</button>
+    </form>
+</section>
+
+            <!-- Feedback Section -->
+            <section class="form-section" id="reviewsSection">
+                <button class="close-form" onclick="closeForm('reviewsSection')">×</button>
+                <h2>💬 Share Your Feedback</h2>
+                <form onsubmit="submitReview(event)">
+                    <div class="form-group">
+                        <label>Your Name</label>
+                        <input type="text" id="reviewName" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email (Optional)</label>
+                        <input type="email" id="reviewEmail" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>How was your experience?</label>
+                        <select id="reviewRating" required>
+                            <option value="">Select</option>
+                            <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                            <option value="4">⭐⭐⭐⭐ Good</option>
+                            <option value="3">⭐⭐⭐ Average</option>
+                            <option value="2">⭐⭐ Below Average</option>
+                            <option value="1">⭐ Poor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Feedback</label>
+                        <textarea id="reviewText" placeholder="Tell us about your experience with Dermamon..." rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                </form>
+            </section>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Analyzing with AI...</p>
+            </div>
+
+            <!-- Results -->
+            <section class="results" id="results">
+                <button class="close-form" onclick="resetForm()">×</button>
+                <div class="result-header">
+                    <div class="result-icon" id="resultIcon">✓</div>
+                    <div>
+                        <h2 id="resultTitle">Analysis Complete</h2>
+                        <p id="resultSubtitle"></p>
+                    </div>
+                </div>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                </div>
+                <p id="confidenceText"></p>
+                <div id="resultDetails"></div>
+                <button class="btn btn-primary" onclick="resetForm()">Check Another</button>
+            </section>
+        </section>
+
+        <!-- About Section -->
+<section class="about-section">
+    <div class="about-container">
+        <!-- Decorative background elements -->
+        <div class="about-bg-decoration"></div>
+        
+        <div class="about-header">
+            <span class="about-badge">TRUSTED BY THOUSANDS</span>
+            <h2>Why Choose Dermamon?</h2>
+            <p class="about-subtitle">Your trusted AI-powered skincare companion for safer, smarter beauty choices</p>
+        </div>
+        
+        <div class="about-features">
+            <div class="about-card">
+                <div class="about-card-header">
+                    <div class="about-card-icon-wrapper">
+                        <div class="about-card-icon">🤖</div>
+                    </div>
+                    <h3>AI-Powered Analysis</h3>
+                </div>
+                <p>Our advanced machine learning models analyze thousands of cosmetic ingredients to provide accurate safety assessments tailored specifically to your unique skin type and concerns.</p>
+                <div class="card-footer-link">
+                    <span onclick="showProductAnalysis()">Try Analysis →</span>
+                </div>
+            </div>
+            
+            <div class="about-card">
+                <div class="about-card-header">
+                    <div class="about-card-icon-wrapper">
+                        <div class="about-card-icon">🛡️</div>
+                    </div>
+                    <h3>Allergy Detection</h3>
+                </div>
+                <p>Identify potential allergens before they harm your skin. Our intelligent system helps you avoid harmful reactions by analyzing your symptoms and product ingredients.</p>
+                <div class="card-footer-link">
+                    <span onclick="showAllergyCheck()">Check Allergies →</span>
+                </div>
+            </div>
+            
+            <div class="about-card">
+                <div class="about-card-header">
+                    <div class="about-card-icon-wrapper">
+                        <div class="about-card-icon">📊</div>
+                    </div>
+                    <h3>Detailed Reports</h3>
+                </div>
+                <p>Get comprehensive breakdowns of beneficial and potentially harmful ingredients with clear risk scores, confidence levels, and personalized recommendations for your skin health.</p>
+                <div class="card-footer-link">
+                    <span onclick="showProductAnalysis()">View Sample →</span>
+                </div>
+            </div>
+            
+            <div class="about-card">
+                <div class="about-card-header">
+                    <div class="about-card-icon-wrapper">
+                        <div class="about-card-icon">💬</div>
+                    </div>
+                    <h3>Smart Chat Assistant</h3>
+                </div>
+                <p>Ask Dermamon anything about skincare, products, or ingredients and receive instant expert answers. It's like having a dermatologist in your pocket, available 24/7.</p>
+                <div class="card-footer-link">
+                    <span onclick="toggleChat()">Start Chatting →</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="about-stats">
+            <div class="stat-item">
+                <div class="stat-icon">🧪</div>
+                <div class="stat-content">
+                    <div class="stat-number">10,000+</div>
+                    <div class="stat-label">Ingredients Analyzed</div>
+                </div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-content">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Accuracy Rate</div>
+                </div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-content">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Available Support</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trust indicators -->
+        <div class="trust-section">
+            <p class="trust-title">Trusted Features</p>
+            <div class="trust-badges">
+                <div class="trust-badge">
+                    <span class="trust-icon">✓</span>
+                    <span>AI-Powered</span>
+                </div>
+                <div class="trust-badge">
+                    <span class="trust-icon">✓</span>
+                    <span>Science-Backed</span>
+                </div>
+                <div class="trust-badge">
+                    <span class="trust-icon">✓</span>
+                    <span>Privacy Focused</span>
+                </div>
+                <div class="trust-badge">
+                    <span class="trust-icon">✓</span>
+                    <span>Free to Use</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>🧴 Dermamon</h3>
+                    <p>Your intelligent skincare companion</p>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Empowering you to make informed decisions about your skin health.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a onclick="showSection('home')">Home</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Us</h4>
+                    <p>Email: support@dermamon.com</p>
+                    <p>Follow us on social media</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Dermamon. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Draggable Game Corner -->
+    <div class="draggable-widget game-widget" id="gameWidget">
+        <div class="widget-content" onclick="toggleGame()">
+            <span class="widget-emoji">🎮</span>
+            <span class="widget-text">Play!</span>
+        </div>
+    </div>
+
+    <!-- Game Popup -->
+    <div class="game-popup" id="gamePopup">
+        <div class="game-popup-header">
+            <h3>🎮 Splash Dermamon!</h3>
+            <button class="close-game" onclick="toggleGame()">×</button>
+        </div>
+        <div class="game-popup-body">
+            <p class="game-instructions">Click on Dermamon to splash him with water! Speed increases over time. Good luck! 💦</p>
+            
+            <div class="game-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="gameScore">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="gameTime">60</div>
+                    <div class="stat-label">Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="highScore">0</div>
+                    <div class="stat-label">Best</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="gameCombo">0</div>
+                    <div class="stat-label">Combo</div>
+                </div>
+            </div>
+
+            <canvas id="gameCanvas" class="game-canvas" width="600" height="400"></canvas>
+            
+            <div class="game-controls">
+                <button class="btn btn-primary" onclick="startGame()" id="startBtn">Start Game</button>
+                <button class="btn btn-secondary" onclick="pauseGame()" id="pauseBtn" style="display:none;">Pause</button>
+                <button class="btn btn-secondary" onclick="resetGame()">Reset</button>
+                <button class="btn btn-secondary" onclick="toggleLeaderboard()">🏆</button>
+            </div>
+
+            <div class="leaderboard hidden" id="gameLeaderboard">
+                <h3>🏆 Top Players</h3>
+                <div id="leaderboardList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Draggable Chat Assistant -->
+    <div class="draggable-widget chat-widget" id="chatWidget">
+        <div class="widget-content" onclick="toggleChat()">
+            <div class="widget-icon">💬</div>
+            <div class="widget-info">
+                <div class="widget-title">Chat</div>
+                <div class="widget-subtitle">Ask me!</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Window -->
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div>
+                <h3>🧴 Dermamon Assistant</h3>
+                <p style="font-size: 0.85rem; opacity: 0.9;">Your skincare expert</p>
+            </div>
+            <button class="chat-close" onclick="toggleChat()">×</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-message bot">
+                <div class="message-bubble bot">Hi! I'm Dermamon 🧴 Ask me anything about skincare products and ingredients!</div>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Ask about products or ingredients..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button class="chat-send" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Login</h2>
+                <button class="modal-close" onclick="closeModal('login')">×</button>
+            </div>
+            <form onsubmit="login(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="signupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sign Up</h2>
+                <button class="modal-close" onclick="closeModal('signup')">×</button>
+            </div>
+            <form onsubmit="signup(event)">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="signupName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="signupPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign Up</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Exit Feedback Modal -->
+<div class="modal" id="exitFeedbackModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Before You Go... 💭</h2>
+            <button class="modal-close" onclick="skipFeedback()">×</button>
+        </div>
+        <p style="margin-bottom: 1.5rem; color: var(--text-light);">
+            Help us improve! Please rate your experience:
+        </p>
+        <form onsubmit="submitExitFeedback(event)">
+            <div class="form-group">
+                <label>Rate Your Experience</label>
+                <div class="star-rating" id="starRating">
+                    <span class="star" data-rating="1">⭐</span>
+                    <span class="star" data-rating="2">⭐</span>
+                    <span class="star" data-rating="3">⭐</span>
+                    <span class="star" data-rating="4">⭐</span>
+                    <span class="star" data-rating="5">⭐</span>
+                </div>
+                <input type="hidden" id="exitRating" required>
+            </div>
+            <div class="form-group">
+                <label>Suggestions for Improvement (Optional)</label>
+                <textarea id="exitComments" placeholder="Tell us how we can improve..." rows="4"></textarea>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                <button type="button" class="btn btn-secondary" onclick="skipFeedback()">Skip</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <script src="config.js"></script>
+    <script src="drag.js"></script>
+    <script src="game.js"></script>
+    <script src="chat.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
